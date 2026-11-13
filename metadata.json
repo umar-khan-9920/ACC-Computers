@@ -1,0 +1,8 @@
+{
+  "name": "Atelier Academy",
+  "description": "A curated video course storefront and learning platform with Google Sheets database integration, QR payment verification, and an admin management studio.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
