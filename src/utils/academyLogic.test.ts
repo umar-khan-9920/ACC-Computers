@@ -18,6 +18,7 @@ import {
   sheetRowToLesson,
   validateCourseForm,
   validateEnrollmentForm,
+  verifyAdminPassword,
 } from './academyLogic';
 import type { Course, EnrollmentRequest, VideoLesson } from '../types/academy';
 
@@ -237,4 +238,12 @@ test('extractSpreadsheetId parses full Google Sheets URLs and raw IDs', () => {
     'https://docs.google.com/spreadsheets/d/1iaqrUhfT7R3VMFC0JoLLyPbFkPY2V-TIhOwXIskmaeQ/edit?usp=drivesdk';
   assert.equal(extractSpreadsheetId(url), DEFAULT_SPREADSHEET_ID);
   assert.equal(extractSpreadsheetId(`  ${DEFAULT_SPREADSHEET_ID}  `), DEFAULT_SPREADSHEET_ID);
+});
+
+test('verifyAdminPassword enforces exact case-sensitive password match', () => {
+  assert.equal(verifyAdminPassword('Umar@(123)'), true);
+  assert.equal(verifyAdminPassword('umar@(123)'), false);
+  assert.equal(verifyAdminPassword('Umar@123'), false);
+  assert.equal(verifyAdminPassword(' Umar@(123) '), false);
+  assert.equal(verifyAdminPassword(''), false);
 });

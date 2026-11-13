@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import type { User } from 'firebase/auth';
-import { ArrowRight, CheckCircle2, PlayCircle, Search } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Lock, PlayCircle, Search } from 'lucide-react';
 import type {
   Course,
   EnrollmentRequest,
@@ -43,6 +43,7 @@ import { EnrollmentModal } from './components/EnrollmentModal';
 import { PlaylistOverviewView } from './components/PlaylistOverviewView';
 import { MyAccessView } from './components/MyAccessView';
 import { AdminDashboard } from './components/AdminDashboard';
+import { AdminPasswordModal } from './components/AdminPasswordModal';
 
 const STORAGE_KEYS = {
   courses: 'acc_computer_courses_v1',
@@ -106,6 +107,8 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [toastBanner, setToastBanner] = useState<string | null>(null);
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [isAdminPromptOpen, setIsAdminPromptOpen] = useState(false);
 
   // Google Auth & Sheets state (token kept strictly in memory via googleAuth.ts)
   const [googleUser, setGoogleUser] = useState<User | null>(null);
@@ -515,11 +518,16 @@ export default function App() {
       <Header
         activeView={activeView}
         onNavigate={(view) => {
+          if (view === 'admin' && !isAdminAuthenticated) {
+            setIsAdminPromptOpen(true);
+            return;
+          }
           setActiveView(view);
           window.scrollTo(0, 0);
         }}
         googleUser={googleUser}
         isLoggingIn={isLoggingIn}
+        isAdminAuthenticated={isAdminAuthenticated}
         onGoogleSignIn={handleGoogleSignIn}
         onGoogleSignOut={handleGoogleSignOut}
       />
@@ -751,30 +759,47 @@ export default function App() {
           />
         )}
 
-        {/* ADMIN DASHBOARD */}
-        {activeView === 'admin' && (
-          <AdminDashboard
-            courses={courses}
-            lessons={lessons}
-            enrollments={enrollments}
-            paymentSettings={paymentSettings}
-            sheetConfig={sheetConfig}
-            googleUser={googleUser}
-            hasAccessToken={hasAccessToken}
-            isSyncingSheets={isSyncingSheets}
-            sheetFeedback={sheetFeedback}
-            onGoogleSignIn={handleGoogleSignIn}
-            onCreateSpreadsheet={handleCreateSpreadsheet}
-            onConnectSpreadsheet={handleConnectSpreadsheet}
-            onPullFromSheet={handlePullFromSheet}
-            onPushToSheet={handlePushToSheet}
-            onUpdateEnrollmentStatus={handleUpdateEnrollmentStatus}
-            onUpdateStudentDetails={handleUpdateStudentDetails}
-            onDeleteEnrollment={handleDeleteEnrollment}
-            onSaveCourse={handleSaveCourse}
-            onDeleteCourse={handleDeleteCourse}
-            onSavePaymentSettings={handleSavePaymentSettings}
-          />
+        {/* ADMIN DASHBOARD (Password Protected) */}
+        {activeView === 'admin' && isAdminAuthenticated && (
+          <div>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-5 flex justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsAdminAuthenticated(false);
+                  setActiveView('home');
+                  window.scrollTo(0, 0);
+                  showToast('Admin panel locked.');
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 hover:border-slate-300 rounded-lg transition-colors"
+              >
+                <Lock className="w-3.5 h-3.5" aria-hidden="true" />
+                Lock Admin
+              </button>
+            </div>
+            <AdminDashboard
+              courses={courses}
+              lessons={lessons}
+              enrollments={enrollments}
+              paymentSettings={paymentSettings}
+              sheetConfig={sheetConfig}
+              googleUser={googleUser}
+              hasAccessToken={hasAccessToken}
+              isSyncingSheets={isSyncingSheets}
+              sheetFeedback={sheetFeedback}
+              onGoogleSignIn={handleGoogleSignIn}
+              onCreateSpreadsheet={handleCreateSpreadsheet}
+              onConnectSpreadsheet={handleConnectSpreadsheet}
+              onPullFromSheet={handlePullFromSheet}
+              onPushToSheet={handlePushToSheet}
+              onUpdateEnrollmentStatus={handleUpdateEnrollmentStatus}
+              onUpdateStudentDetails={handleUpdateStudentDetails}
+              onDeleteEnrollment={handleDeleteEnrollment}
+              onSaveCourse={handleSaveCourse}
+              onDeleteCourse={handleDeleteCourse}
+              onSavePaymentSettings={handleSavePaymentSettings}
+            />
+          </div>
         )}
       </main>
 
@@ -785,35 +810,68 @@ export default function App() {
           <div className="flex items-center gap-6">
             <button
               type="button"
-              onClick={() => setActiveView('home')}
+              onClick={() => {
+                setActiveView('home');
+                window.scrollTo(0, 0);
+              }}
               className="hover:text-slate-900 transition-colors"
             >
               Courses
             </button>
             <button
               type="button"
-              onClick={() => setActiveView('playlists')}
+              onClick={() => {
+                setActiveView('playlists');
+                window.scrollTo(0, 0);
+              }}
               className="hover:text-slate-900 transition-colors"
             >
               Playlists
             </button>
             <button
               type="button"
-              onClick={() => setActiveView('access')}
+              onClick={() => {
+                setActiveView('access');
+                window.scrollTo(0, 0);
+              }}
               className="hover:text-slate-900 transition-colors"
             >
               Student Access
             </button>
-            <button
-              type="button"
-              onClick={() => setActiveView('admin')}
-              className="hover:text-slate-900 transition-colors"
-            >
-              Admin Portal
-            </button>
           </div>
         </div>
       </footer>
+
+      {/* Tiny discreet Admin access sign in left-bottom corner */}
+      <button
+        type="button"
+        onClick={() => {
+          if (isAdminAuthenticated) {
+            setActiveView('admin');
+            window.scrollTo(0, 0);
+          } else {
+            setIsAdminPromptOpen(true);
+          }
+        }}
+        aria-label="Admin Sign In"
+        title="Admin Sign In"
+        className="fixed bottom-3 left-3 z-40 w-7 h-7 rounded-md flex items-center justify-center bg-white/75 hover:bg-white text-slate-400 hover:text-slate-800 border border-slate-200/70 hover:border-slate-300 shadow-xs opacity-50 hover:opacity-100 transition-all focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-blue-700"
+      >
+        <Lock className="w-3.5 h-3.5" aria-hidden="true" />
+      </button>
+
+      {/* Admin Password Prompt Modal */}
+      <AdminPasswordModal
+        isOpen={isAdminPromptOpen}
+        onClose={() => setIsAdminPromptOpen(false)}
+        onUnlock={() => {
+          setIsAdminAuthenticated(true);
+          setIsAdminPromptOpen(false);
+          setActiveView('admin');
+          window.scrollTo(0, 0);
+          showToast('Admin Studio unlocked.');
+        }}
+      />
 
       {/* Enrollment Checkout Modal */}
       <EnrollmentModal

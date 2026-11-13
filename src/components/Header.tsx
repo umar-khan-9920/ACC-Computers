@@ -9,6 +9,7 @@ interface HeaderProps {
   onNavigate: (view: AppView) => void;
   googleUser: User | null;
   isLoggingIn: boolean;
+  isAdminAuthenticated: boolean;
   onGoogleSignIn: () => void;
   onGoogleSignOut: () => void;
 }
@@ -18,6 +19,7 @@ export const Header: React.FC<HeaderProps> = ({
   onNavigate,
   googleUser,
   isLoggingIn,
+  isAdminAuthenticated,
   onGoogleSignIn,
   onGoogleSignOut,
 }) => {
@@ -27,7 +29,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'home', label: 'Courses' },
     { id: 'playlists', label: 'Playlists' },
     { id: 'access', label: 'My Access' },
-    { id: 'admin', label: 'Admin' },
+    ...(isAdminAuthenticated ? [{ id: 'admin' as AppView, label: 'Admin' }] : []),
   ];
 
   const handleNavClick = (view: AppView) => {

@@ -388,3 +388,9 @@ export function extractSpreadsheetId(input: string): string {
   }
   return trimmed;
 }
+
+export const ADMIN_PASSWORD = 'Umar@(123)';
+
+export function verifyAdminPassword(input: string): boolean {
+  return input === ADMIN_PASSWORD;
+}
