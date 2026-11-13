@@ -376,3 +376,15 @@ export function buildUpiPaymentUri(params: {
   }
   return base;
 }
+
+export const DEFAULT_SPREADSHEET_ID = '1iaqrUhfT7R3VMFC0JoLLyPbFkPY2V-TIhOwXIskmaeQ';
+export const DEFAULT_SPREADSHEET_URL = `https://docs.google.com/spreadsheets/d/${DEFAULT_SPREADSHEET_ID}/edit`;
+
+export function extractSpreadsheetId(input: string): string {
+  const trimmed = input.trim();
+  const match = trimmed.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  if (match && match[1]) {
+    return match[1];
+  }
+  return trimmed;
+}

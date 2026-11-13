@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import {
   buildUpiPaymentUri,
   courseToSheetRow,
+  DEFAULT_SPREADSHEET_ID,
   enrollmentToSheetRow,
+  extractSpreadsheetId,
   formatCurrency,
   formatTotalDuration,
   generateQrMatrix,
@@ -228,4 +230,11 @@ test('generateQrMatrix and buildUpiPaymentUri produce standard ACC Computer UPI 
   assert.equal(m1[1][1], false);
   assert.equal(m1[3][3], true);
   assert.ok(formatCurrency(2499).includes('2,499'));
+});
+
+test('extractSpreadsheetId parses full Google Sheets URLs and raw IDs', () => {
+  const url =
+    'https://docs.google.com/spreadsheets/d/1iaqrUhfT7R3VMFC0JoLLyPbFkPY2V-TIhOwXIskmaeQ/edit?usp=drivesdk';
+  assert.equal(extractSpreadsheetId(url), DEFAULT_SPREADSHEET_ID);
+  assert.equal(extractSpreadsheetId(`  ${DEFAULT_SPREADSHEET_ID}  `), DEFAULT_SPREADSHEET_ID);
 });

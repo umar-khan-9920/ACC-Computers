@@ -17,6 +17,7 @@ import {
   INITIAL_PAYMENT_SETTINGS,
 } from './data/seedData';
 import {
+  DEFAULT_SPREADSHEET_ID,
   getLatestEnrollmentForCourse,
   isCourseUnlockedForStudent,
 } from './utils/academyLogic';
@@ -48,7 +49,7 @@ const STORAGE_KEYS = {
   lessons: 'acc_computer_lessons_v1',
   enrollments: 'acc_computer_enrollments_v1',
   paymentSettings: 'acc_computer_payment_v1',
-  sheetConfig: 'acc_computer_sheet_cfg_v1',
+  sheetConfig: 'acc_computer_sheet_cfg_v2',
   studentEmail: 'acc_computer_student_email_v1',
 } as const;
 
@@ -81,8 +82,8 @@ export default function App() {
   );
   const [sheetConfig, setSheetConfig] = useState<SheetSyncConfig>(() =>
     readStorage(STORAGE_KEYS.sheetConfig, {
-      spreadsheetId: '',
-      spreadsheetTitle: '',
+      spreadsheetId: DEFAULT_SPREADSHEET_ID,
+      spreadsheetTitle: 'ACC Computer Linked Database',
       lastSyncedAt: null,
       availableTabs: [],
     })
@@ -221,10 +222,20 @@ export default function App() {
         lastSyncedAt: new Date().toISOString(),
         availableTabs: data.tabNames,
       });
-      setSheetFeedback({
-        type: 'success',
-        message: `Synced ${data.courses.length} courses and ${data.enrollments.length} enrollments from "${data.title}".`,
-      });
+
+      if (data.missingRequiredTabs.length > 0) {
+        setSheetFeedback({
+          type: 'error',
+          message: `Connected "${data.title}", but it is missing database tab(s): ${data.missingRequiredTabs.join(
+            ', '
+          )}. Click "Initialize Database Tabs in Sheet" below to set up the tables.`,
+        });
+      } else {
+        setSheetFeedback({
+          type: 'success',
+          message: `Synced ${data.courses.length} courses and ${data.enrollments.length} enrollments from "${data.title}".`,
+        });
+      }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to fetch data from Google Sheet.';
       setSheetFeedback({ type: 'error', message });
@@ -296,10 +307,11 @@ export default function App() {
       setSheetConfig((prev) => ({
         ...prev,
         lastSyncedAt: new Date().toISOString(),
+        availableTabs: ['Courses', 'Lessons', 'Enrollments', 'Settings'],
       }));
       setSheetFeedback({
         type: 'success',
-        message: 'Pushed local courses, playlists, enrollments, and QR settings to Google Sheets.',
+        message: 'Synced Courses, Lessons, Enrollments, and Settings tabs in Google Sheets.',
       });
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to push data to Google Sheets.';

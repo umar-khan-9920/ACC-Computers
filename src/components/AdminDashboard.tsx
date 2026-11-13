@@ -5,6 +5,7 @@ import {
   Clock,
   Database,
   Edit3,
+  ExternalLink,
   Eye,
   Plus,
   RefreshCw,
@@ -805,14 +806,39 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
             )}
 
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="font-semibold text-slate-900">Linked Database Spreadsheet</span>
+                {sheetConfig.spreadsheetId && (
+                  <a
+                    href={`https://docs.google.com/spreadsheets/d/${sheetConfig.spreadsheetId}/edit`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 font-semibold text-blue-700 hover:underline"
+                  >
+                    Open Google Sheet
+                    <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
+                  </a>
+                )}
+              </div>
+              <p className="font-mono text-slate-700 break-all">
+                {sheetConfig.spreadsheetId || 'No spreadsheet linked'}
+              </p>
+              {sheetConfig.availableTabs.length > 0 && (
+                <p className="text-slate-500">
+                  Detected Tabs: {sheetConfig.availableTabs.join(', ')}
+                </p>
+              )}
+            </div>
+
             {!googleUser || !hasAccessToken ? (
               <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
                 <p className="text-sm font-semibold text-slate-900">
                   Connect Your Google Account to Sync Sheets
                 </p>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Sign in with Google to create a new spreadsheet database or connect an existing
-                  Google Sheet ID for live dynamic course data.
+                  Sign in with Google to read live courses and enrollment submissions from your
+                  linked Google Sheet and write updates directly via the Sheets API.
                 </p>
                 <button
                   type="button"
@@ -846,6 +872,40 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </p>
                   )}
                 </div>
+
+                {sheetConfig.spreadsheetId &&
+                  ['Courses', 'Lessons', 'Enrollments', 'Settings'].some(
+                    (tab) => !sheetConfig.availableTabs.includes(tab)
+                  ) && (
+                    <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl space-y-2.5">
+                      <p className="text-xs font-semibold text-amber-900">
+                        Database Tabs Not Yet Initialized in Linked Sheet
+                      </p>
+                      <p className="text-xs text-amber-800 leading-relaxed">
+                        Create the required Courses, Lessons, Enrollments, and Settings tabs in
+                        your connected Google Sheet and populate starter records.
+                      </p>
+                      <button
+                        type="button"
+                        disabled={isSyncingSheets}
+                        onClick={() =>
+                          setConfirmState({
+                            title: 'Initialize Database Tabs in Google Sheet?',
+                            description: `This will create Courses, Lessons, Enrollments, and Settings tabs inside "${sheetConfig.spreadsheetTitle}" and write your current courses and settings.`,
+                            confirmLabel: 'Initialize Tabs & Sync',
+                            tone: 'primary',
+                            action: async () => {
+                              await onPushToSheet();
+                              setConfirmState(null);
+                            },
+                          })
+                        }
+                        className="px-4 py-2 text-xs font-semibold text-white bg-blue-700 hover:bg-blue-800 rounded-lg transition-colors"
+                      >
+                        Initialize Database Tabs in Sheet
+                      </button>
+                    </div>
+                  )}
 
                 <div className="flex flex-wrap gap-3">
                   <button

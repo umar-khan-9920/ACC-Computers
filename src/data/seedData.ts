@@ -1,14 +1,35 @@
 import type { Course, EnrollmentRequest, PaymentSettings, VideoLesson } from '../types/academy';
 
-export const HERO_BANNER_IMAGE = '/src/assets/images/hero_studio_academy_1794535951946.jpg';
+import heroBannerAsset from '../assets/images/hero_studio_academy_1794535951946.jpg';
+import cinematographyAsset from '../assets/images/course_cinematography_1794535953971.jpg';
+import uiArchitectureAsset from '../assets/images/course_ui_architecture_1794535953279.jpg';
+import soundDesignAsset from '../assets/images/course_sound_design_1794535954444.jpg';
+import fullstackSystemsAsset from '../assets/images/course_fullstack_systems_1794535954997.jpg';
+import brandTypographyAsset from '../assets/images/course_brand_typography_1794535955318.jpg';
+
+export const HERO_BANNER_IMAGE = heroBannerAsset;
 
 export const COURSE_IMAGES = {
-  cinematography: '/src/assets/images/course_cinematography_1794535953971.jpg',
-  uiArchitecture: '/src/assets/images/course_ui_architecture_1794535953279.jpg',
-  soundDesign: '/src/assets/images/course_sound_design_1794535954444.jpg',
-  fullstackSystems: '/src/assets/images/course_fullstack_systems_1794535954997.jpg',
-  brandTypography: '/src/assets/images/course_brand_typography_1794535955318.jpg',
+  cinematography: cinematographyAsset,
+  uiArchitecture: uiArchitectureAsset,
+  soundDesign: soundDesignAsset,
+  fullstackSystems: fullstackSystemsAsset,
+  brandTypography: brandTypographyAsset,
 } as const;
+
+const LEGACY_ASSET_MAP: Record<string, string> = {
+  '/src/assets/images/hero_studio_academy_1794535951946.jpg': heroBannerAsset,
+  '/src/assets/images/course_cinematography_1794535953971.jpg': cinematographyAsset,
+  '/src/assets/images/course_ui_architecture_1794535953279.jpg': uiArchitectureAsset,
+  '/src/assets/images/course_sound_design_1794535954444.jpg': soundDesignAsset,
+  '/src/assets/images/course_fullstack_systems_1794535954997.jpg': fullstackSystemsAsset,
+  '/src/assets/images/course_brand_typography_1794535955318.jpg': brandTypographyAsset,
+};
+
+export function resolveSeedImageUrl(url?: string): string | undefined {
+  if (!url) return url;
+  return LEGACY_ASSET_MAP[url] || url;
+}
 
 export const INITIAL_COURSES: Course[] = [
   {

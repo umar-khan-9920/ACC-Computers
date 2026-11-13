@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Film } from 'lucide-react';
+import { resolveSeedImageUrl } from '../data/seedData';
 
 interface SafeImageProps {
   src?: string;
@@ -15,8 +16,9 @@ export const SafeImage: React.FC<SafeImageProps> = ({
   fallbackLabel,
 }) => {
   const [hasError, setHasError] = useState(false);
+  const resolvedSrc = resolveSeedImageUrl(src);
 
-  if (!src || hasError) {
+  if (!resolvedSrc || hasError) {
     return (
       <div
         role="img"
@@ -33,7 +35,7 @@ export const SafeImage: React.FC<SafeImageProps> = ({
 
   return (
     <img
-      src={src}
+      src={resolvedSrc}
       alt={alt}
       referrerPolicy="no-referrer"
       onError={() => setHasError(true)}

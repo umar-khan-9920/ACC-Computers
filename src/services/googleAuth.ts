@@ -54,6 +54,21 @@ export const signInWithGoogleSheets = async (): Promise<{
     }
     cachedAccessToken = credential.accessToken;
     return { user: result.user, accessToken: cachedAccessToken };
+  } catch (err: unknown) {
+    const code =
+      typeof err === 'object' && err !== null && 'code' in err
+        ? String((err as { code?: unknown }).code)
+        : '';
+    if (code === 'auth/unauthorized-domain') {
+      const host = typeof window !== 'undefined' ? window.location.hostname : 'this domain';
+      throw new Error(
+        `Domain "${host}" is not authorized for Google Sign-In yet. Add "${host}" in Firebase Console → Authentication → Settings → Authorized domains.`
+      );
+    }
+    if (code === 'auth/popup-blocked') {
+      throw new Error('Sign-in popup was blocked by the browser. Allow popups for this site and try again.');
+    }
+    throw err;
   } finally {
     isSigningIn = false;
   }

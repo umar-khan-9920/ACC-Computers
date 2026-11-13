@@ -9,6 +9,7 @@ import {
   courseToSheetRow,
   ENROLLMENTS_HEADER,
   enrollmentToSheetRow,
+  extractSpreadsheetId,
   LESSONS_HEADER,
   lessonToSheetRow,
   SETTINGS_HEADER,
@@ -83,14 +84,7 @@ export async function inspectSpreadsheetMetadata(
   };
 }
 
-export function extractSpreadsheetId(input: string): string {
-  const trimmed = input.trim();
-  const match = trimmed.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-  if (match && match[1]) {
-    return match[1];
-  }
-  return trimmed;
-}
+export { extractSpreadsheetId };
 
 export async function ensureRequiredTabs(
   accessToken: string,
@@ -154,6 +148,7 @@ export async function fetchAcademyDataFromSheet(
   spreadsheetId: string;
   title: string;
   tabNames: string[];
+  missingRequiredTabs: string[];
   courses: Course[];
   lessons: VideoLesson[];
   enrollments: EnrollmentRequest[];
@@ -161,12 +156,14 @@ export async function fetchAcademyDataFromSheet(
 }> {
   const meta = await inspectSpreadsheetMetadata(accessToken, rawSpreadsheetId);
   const tabsToRead = REQUIRED_TABS.filter((tab) => meta.tabNames.includes(tab));
+  const missingRequiredTabs = REQUIRED_TABS.filter((tab) => !meta.tabNames.includes(tab));
 
   if (tabsToRead.length === 0) {
     return {
       spreadsheetId: meta.spreadsheetId,
       title: meta.title,
       tabNames: meta.tabNames,
+      missingRequiredTabs,
       courses: [],
       lessons: [],
       enrollments: [],
@@ -217,6 +214,7 @@ export async function fetchAcademyDataFromSheet(
     spreadsheetId: meta.spreadsheetId,
     title: meta.title,
     tabNames: meta.tabNames,
+    missingRequiredTabs,
     courses,
     lessons,
     enrollments,
