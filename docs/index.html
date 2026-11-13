@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ACC Computer — Video Courses & Studio Playlists</title>
+    <meta
+      name="description"
+      content="Master cinematography, UI architecture, sound design, and systems engineering through structured video course playlists with Google Sheets integration."
+    />
+    <meta property="og:title" content="ACC Computer — Video Courses & Studio Playlists" />
+    <meta
+      property="og:description"
+      content="Curated video courses with structured lesson playlists, QR payment verification, and live Google Sheets database management."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script type="module" crossorigin src="./assets/index-BI0VE12X.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-MJTZBlkJ.css">
+  </head>
+  <body class="bg-slate-50 text-slate-900 antialiased selection:bg-blue-700 selection:text-white">
+    <div id="root"></div>
+    <script>
+      (function () {
+        window.setTimeout(function () {
+          var root = document.getElementById('root');
+          if (window.__ACC_APP_MOUNTED__ || (root && root.childElementCount > 0)) return;
+          var rawEntry = document.querySelector('script[src*="/src/main.tsx"]');
+          var host = window.location.hostname || '';
+          var isLocalOrPreview =
+            host === 'localhost' ||
+            host === '127.0.0.1' ||
+            host.indexOf('.run.app') !== -1;
+          if (!rawEntry || isLocalOrPreview) return;
+
+          fetch('./docs/index.html', { method: 'HEAD' })
+            .then(function (res) {
+              if (res.ok) {
+                var base = window.location.pathname.endsWith('/')
+                  ? window.location.pathname
+                  : window.location.pathname + '/';
+                window.location.replace(
+                  base + 'docs/' + window.location.search + window.location.hash
+                );
+                return;
+              }
+              throw new Error('Built docs folder not found');
+            })
+            .catch(function () {
+              if (root) {
+                root.innerHTML =
+                  '<div style="max-width:560px;margin:64px auto;padding:24px;font-family:system-ui,sans-serif;background:#fff;border:1px solid #e2e8f0;border-radius:12px;color:#0f172a">' +
+                  '<h1 style="font-size:18px;margin:0 0 8px">ACC Computer — GitHub Pages Setup Needed</h1>' +
+                  '<p style="font-size:14px;line-height:1.5;color:#475569;margin:0 0 12px">GitHub Pages is currently serving raw source files instead of the compiled site.</p>' +
+                  '<p style="font-size:14px;line-height:1.5;color:#475569;margin:0">In your repository <strong>Settings → Pages</strong>, set Source to <strong>GitHub Actions</strong> or select branch <strong>main</strong> with folder <strong>/docs</strong>.</p>' +
+                  '</div>';
+              }
+            });
+        }, 1500);
+      })();
+    </script>
+  </body>
+</html>

@@ -24,12 +24,23 @@ npm run build
 
 ## Hosting Live on GitHub Pages
 
-This project is preconfigured as a 100% static client-side bundle with relative asset paths (`base: './'` in `vite.config.ts`) and an automated GitHub Actions workflow (`.github/workflows/deploy.yml`).
+This project is preconfigured as a 100% static client-side bundle with relative asset paths (`base: './'` in `vite.config.ts`), a pre-built `docs/` folder, and an automated GitHub Actions workflow (`.github/workflows/deploy.yml`).
+
+> **Why a white screen happens if you deploy from `main` / `/ (root)`:** GitHub Pages serves raw files directly when `/ (root)` is selected, and browsers cannot execute uncompiled `/src/main.tsx`. Always choose one of the two options below:
+
+### Option A: Automated GitHub Actions (Recommended)
 
 1. Push this repository to GitHub (`main` or `master` branch).
 2. In your GitHub repository, open **Settings → Pages**.
 3. Under **Build and deployment → Source**, select **GitHub Actions**.
-4. GitHub Actions will automatically run type checks, unit tests, build `dist/`, and publish your site to `https://<your-username>.github.io/<your-repo>/`.
+4. GitHub Actions will build `dist/` and publish your site to `https://<your-username>.github.io/<your-repo>/`.
+
+### Option B: Deploy Directly from Branch (`/docs` folder)
+
+1. Push this repository (including the pre-built `docs/` folder) to GitHub.
+2. In **Settings → Pages**, select **Deploy from a branch**.
+3. Set Branch to **`main`** and Folder to **`/docs`**, then click **Save**.
+4. Whenever you edit source code, run `npm run build:github` before pushing to refresh `docs/`.
 
 ### Enabling Google Sign-In on Your GitHub Pages Domain
 
